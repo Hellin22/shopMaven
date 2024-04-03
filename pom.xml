@@ -50,6 +50,11 @@
 			<version>5.0.0</version>
 		</dependency>
 
+		<!-- Spring Boot Devtools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.h2database</groupId>
