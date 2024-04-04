@@ -23,25 +23,32 @@ public class SecurityConfig {
     MemberService memberService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests(authorizeRequests ->
-                        authorizeRequests.anyRequest().authenticated()
-                )
-                .formLogin(withDefaults());
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http.formLogin()
+                .loginPage("/members/login")
+                .defaultSuccessUrl("/")
+                .usernameParameter("email")
+                .failureUrl("/members/login/error")
+                .and()
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout"))
+                .logoutSuccessUrl("/")
+        ;
 
         return http.build();
     }
 
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        var user = User.withUsername("user")
-                .password(passwordEncoder.encode("password"))
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(user);
-    }
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
+//        var user = User.withUsername("user")
+//                .password(passwordEncoder.encode("password"))
+//                .roles("USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(user);
+//    } -> 이 부분은 스프링 시큐리티 처음에 로그인하는 부분에서 로그인이 bcrypt 안돼서 "user", "password"로 아이디 비번 맞춰놓은것
+//         이 부분 때문에 계속 로그인할때 아이디 비밀번호가 잘못됐다고 뜬듯..
 
 
     @Bean
