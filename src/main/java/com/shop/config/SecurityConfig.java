@@ -36,6 +36,18 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/")
         ;
 
+        http.authorizeRequests()
+                .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
+                .requestMatchers("/", "/members/**", "/item/**", "/images/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+        ;
+
+        http.exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                // 인증되지 않은 사용자가 리소스에 접근하였을때 수행되는 핸들러 적용
+        ;
+
         return http.build();
     }
 
