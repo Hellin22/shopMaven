@@ -3,6 +3,7 @@ package com.shop.entity;
 import com.shop.constant.ItemSellStatus;
 import com.shop.repository.ItemRepository;
 import com.shop.repository.MemberRepository;
+import com.shop.repository.OrderItemRepository;
 import com.shop.repository.OrderRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,6 +33,9 @@ class OrderTest {
 
     @Autowired
     MemberRepository memberRepository; // 고아객체 제거 기능에서 추가한 리파지토리
+
+    @Autowired
+    OrderItemRepository orderItemRepository; // 지연 로딩 기능에서 추가한 리파지토리
 
     @PersistenceContext
     EntityManager em;
@@ -94,12 +98,39 @@ class OrderTest {
         return order;
     }
 
-
     @Test
     @DisplayName("고아객체 제거 테스트")
     public void orphanRemovalTest(){
         Order order = this.createOrder();
         order.getOrderItems().remove(0);
         em.flush();
+    }
+
+//    @Test
+//    @DisplayName("지연 로딩 테스트")
+//    public void lazyLoadingTest(){
+//        Order order = this.createOrder();
+//        Long orderItemId = order.getOrderItems().get(0).getId();
+//        em.flush();
+//        em.clear();
+
+//        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+//                .orElseThrow(EntityNotFoundException::new);
+//        System.out.println("Order class : " + orderItem.getOrder().getClass());
+//    } // 즉시 로딩 테스트 -> FetchType.LAZY 설정을 안했을 때
+
+    @Test
+    @DisplayName("지연 로딩 테스트")
+    public void lazyLoadingTest(){
+        Order order = this.createOrder();
+        Long orderItemId = order.getOrderItems().get(0).getId();
+        em.flush();
+        em.clear();
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(EntityNotFoundException::new);
+        System.out.println("Order class : " + orderItem.getOrder().getClass());
+        System.out.println("===========================");
+        orderItem.getOrder().getOrderDate();
+        System.out.println("===========================");
     }
 }

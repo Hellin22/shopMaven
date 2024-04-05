@@ -20,7 +20,7 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member; // 한명의 회원은 여러번 주문 가능 -> 주문 엔티티 기준 다대일 매핑
 
@@ -32,7 +32,7 @@ public class Order {
     // OrderItem 생성 후 Order에 추가 (양방향 매핑이 된다~~)
     // orphanRemoval = true를 통해 해당 orderItems 안에 있는 orderItem들은 orders가 사라지면 고아객체가 되므로 같이 사라짐.
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL
-                ,orphanRemoval = true)
+                ,orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     private LocalDateTime regTime;

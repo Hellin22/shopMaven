@@ -16,11 +16,11 @@ public class OrderItem {
     @Column(name = "order_item_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item; // 하나의 상품은 여러 주문 상품으로 들어갈 수 있음. 따라서 주문 상품 기준 many to one
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order; // 하나의 주문에 여러개의 상품 가능. 따라서 주문 상품 기준 주문을 many to one
     // manytoone이랑 onetomany는 앞에 있는게 쓰여진곳 기준이라 생각하면 된다.
