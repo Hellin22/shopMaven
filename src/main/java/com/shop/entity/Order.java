@@ -30,7 +30,7 @@ public class Order {
     private OrderStatus orderStatus; // 주문 상태
 
     // OrderItem 생성 후 Order에 추가 (양방향 매핑이 된다~~
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     private LocalDateTime regTime;
