@@ -13,11 +13,11 @@ public class OrderItem {
 
     @Id
     @GeneratedValue
-    @Column
+    @Column(name = "order_item_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "order_item_id")
+    @JoinColumn(name = "item_id")
     private Item item; // 하나의 상품은 여러 주문 상품으로 들어갈 수 있음. 따라서 주문 상품 기준 many to one
 
     @ManyToOne

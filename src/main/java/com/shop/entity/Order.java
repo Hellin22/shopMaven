@@ -29,8 +29,10 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus; // 주문 상태
 
-    // OrderItem 생성 후 Order에 추가 (양방향 매핑이 된다~~
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    // OrderItem 생성 후 Order에 추가 (양방향 매핑이 된다~~)
+    // orphanRemoval = true를 통해 해당 orderItems 안에 있는 orderItem들은 orders가 사라지면 고아객체가 되므로 같이 사라짐.
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL
+                ,orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     private LocalDateTime regTime;

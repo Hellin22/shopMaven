@@ -2,6 +2,7 @@ package com.shop.entity;
 
 import com.shop.constant.ItemSellStatus;
 import com.shop.repository.ItemRepository;
+import com.shop.repository.MemberRepository;
 import com.shop.repository.OrderRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,6 +29,9 @@ class OrderTest {
 
     @Autowired
     ItemRepository itemRepository;
+
+    @Autowired
+    MemberRepository memberRepository; // 고아객체 제거 기능에서 추가한 리파지토리
 
     @PersistenceContext
     EntityManager em;
@@ -68,6 +72,34 @@ class OrderTest {
         Order savedOrder = orderRepository.findById(order.getId())
                 .orElseThrow(EntityNotFoundException::new);
         assertEquals(3, savedOrder.getOrderItems().size());
+    }
 
+
+    public Order createOrder(){
+        Order order = new Order();
+        for(int i=0;i<3;i++){
+            Item item = createItem();
+            itemRepository.save(item);
+            OrderItem orderItem = new OrderItem();
+            orderItem.setItem(item);
+            orderItem.setCount(10);
+            orderItem.setOrderPrice(1000);
+            orderItem.setOrder(order);
+            order.getOrderItems().add(orderItem);
+        }
+        Member member = new Member();
+        memberRepository.save(member);
+        order.setMember(member);
+        orderRepository.save(order);
+        return order;
+    }
+
+
+    @Test
+    @DisplayName("고아객체 제거 테스트")
+    public void orphanRemovalTest(){
+        Order order = this.createOrder();
+        order.getOrderItems().remove(0);
+        em.flush();
     }
 }
