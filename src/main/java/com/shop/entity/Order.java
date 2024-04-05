@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "orders") // 정렬시 사용되는 order이라는 키워드 때문에 orders로 변경
-public class Order {
+public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -35,7 +35,7 @@ public class Order {
                 ,orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    private LocalDateTime regTime;
-
-    private LocalDateTime updateTime;
+    // private LocalDateTime regTime;
+    // private LocalDateTime updateTime;
+    // BaseEntity를 통한 통합관리로 인한 삭제
 }
