@@ -38,4 +38,25 @@ public class ItemImgService {
         itemImg.updateItemImg(oriImgName, imgName, imgUrl);
         itemImgRepository.save(itemImg);
     }
+
+    // 아이템 이미지 아이디를 통해서 아이템 이미지 자체를 바꾸는것.
+    // 이 메서드는 아이템 자체와는 관련이 없다.
+    public void updateItemImg(Long itemImgId, MultipartFile itemImgFile) throws Exception {
+        if(!itemImgFile.isEmpty()){ // 이미지 파일이 있다면
+            ItemImg savedItemImg = itemImgRepository.findById(itemImgId)
+                    .orElseThrow(EntityNotFoundException::new);
+
+            // 기존 이미지 파일 삭제
+            if(!StringUtils.isEmpty(savedItemImg.getImgName())){
+                fileService.deleteFile(itemImgLocation+"/"
+                                            +savedItemImg.getImgName());
+            }
+
+            String oriImgName = itemImgFile.getOriginalFilename();
+            String imgName = fileService.uploadFile(itemImgLocation, oriImgName,
+                    itemImgFile.getBytes());
+            String imgUrl = "/images/item/" + imgName;
+            savedItemImg.updateItemImg(oriImgName, imgName, imgUrl);
+        }
+    }
 }
