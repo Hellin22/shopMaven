@@ -2,6 +2,7 @@ package com.shop.entity;
 
 
 import com.shop.constant.ItemSellStatus;
+import com.shop.dto.ItemFormDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,5 +41,14 @@ public class Item extends BaseEntity{
 //    private LocalDateTime regTime; // 상품 등록 시간
 //    private LocalDateTime updateTime; // 상품 수정 시간
     // BaseEntity를 통한 통합관리로 인한 삭제
+
+    // item 업데이트하는 로직 -> 엔티티에 비즈니스 로직을 추가해서 재활용 가능
+    public void updateItem(ItemFormDto itemFormDto){
+        this.itemNm = itemFormDto.getItemNm();
+        this.itemDetail = itemFormDto.getItemDetail();
+        this.itemSellStatus=itemFormDto.getItemSellStatus();
+        this.stockNumber = itemFormDto.getStockNumber();
+        this.price = itemFormDto.getPrice();
+    }
 }
 

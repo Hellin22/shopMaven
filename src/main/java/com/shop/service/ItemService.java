@@ -70,4 +70,21 @@ public class ItemService {
     }
     // 전체적으로 보면 파라미터로 받은 itemId에 대한 아이템과 아이템 이미지 리스트를 가져오고
     // 그것에 대한 formDto를 만드는것. (폼에 전송할 데이터는 item도 있고 itemImg도 있어서 formData로 한번에 보내기)
+
+
+    public Long updateItem(ItemFormDto itemFormDto, List<MultipartFile> itemImgFileList) throws Exception {
+
+        Item item = itemRepository.findById(itemFormDto.getId())
+                .orElseThrow(EntityNotFoundException::new);
+        item.updateItem(itemFormDto);
+
+        List<Long> itemImgIds = itemFormDto.getItemImgIds();
+        // 아이템 이미지 파일들의 id값 즉, itemImgId들을 담은 List
+
+        for(int i = 0; i <itemImgFileList.size(); i++){
+            itemImgService.updateItemImg(itemImgIds.get(i), itemImgFileList.get(i));
+        } // 이 구문을 통해서 아이템 이미지 파일들을 업데이트함.
+
+        return item.getId();
+    }
 }
