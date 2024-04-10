@@ -1,10 +1,15 @@
 package com.shop.controller;
 
 import com.shop.dto.ItemFormDto;
+import com.shop.dto.ItemSearchDto;
+import com.shop.entity.Item;
 import com.shop.service.ItemService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -88,5 +94,24 @@ public class ItemController {
             return "item/itemForm";
         }
         return "redirect:/";
+    }
+
+    @GetMapping(value = {"/admin/items", "/admin/items/{page}"}) // url에 페이지가 없는 경우도 같이 매핑한다.
+    public String itemManage(ItemSearchDto itemSearchDto,
+                             @PathVariable("page")Optional<Integer> page, Model model){
+        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 3);
+        // 페이징을 위해 Pageable 객체를 생성한다. 파라미터는 2개로 (조회할 페이지 번호, 한번에 가지고 올 데이터 수)이다.
+        // 우리가 매핑을 2개 해줬는데 만약 page가 url에 없으면 0을 넣어준다.
+
+        Page<Item> items = itemService.getAdminItemPage(itemSearchDto, pageable);
+
+        model.addAttribute("items", items);
+        model.addAttribute("itemSearchDto", itemSearchDto);
+        // 기존에 작성하던거 그대로 유지하도록 itemSearchDto를 그대로 보낸다.
+        model.addAttribute("maxPage", 5);
+        // 상품 관리 메뉴 하단에 보여줄 페이지 번호의 최대수이다. 5이므로 최대 5개의 이동 페이지가 보인다.
+
+        return "item/itemMng";
+
     }
 }
