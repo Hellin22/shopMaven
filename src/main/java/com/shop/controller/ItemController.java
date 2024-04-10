@@ -112,6 +112,12 @@ public class ItemController {
         // 상품 관리 메뉴 하단에 보여줄 페이지 번호의 최대수이다. 5이므로 최대 5개의 이동 페이지가 보인다.
 
         return "item/itemMng";
+    }
 
+    @GetMapping("/item/{itemId}")
+    public String itemDtl(Model model, @PathVariable("itemId") Long itemId) {
+        ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
+        model.addAttribute("item", itemFormDto);
+        return "item/itemDtl";
     }
 }
