@@ -32,4 +32,21 @@ public class OrderItem extends BaseEntity{
 //    private LocalDateTime regTime;
 //    private LocalDateTime updateTime;
     // BaseEntity를 통한 통합관리로 인한 삭제
+
+    // 주문 상품 만드는 메서드 -> (살 아이템, 수량)이 파라미터로 온다.
+    public static OrderItem createOrderItem(Item item, int count){
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(item);
+        orderItem.setCount(count);
+
+        orderItem.setOrderPrice(item.getPrice());
+
+        item.removeStock(count);
+        return orderItem;
+    }
+
+    // 주문 금액 계산 메서드
+    public int getTotalPrice(){
+        return orderPrice*count;
+    }
 }
