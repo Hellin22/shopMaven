@@ -10,4 +10,6 @@ public interface ItemImgRepository extends JpaRepository<ItemImg, Long> {
 
     List<ItemImg> findByItemIdOrderByIdAsc(Long itemId);
     // itemId를 통해서 해당 아이템의 아이템 이미지 id를 오름차순으로 출력해줌
+
+    ItemImg findByItemIdAndRepimgYn(Long itemId, String repimgYn);
 }

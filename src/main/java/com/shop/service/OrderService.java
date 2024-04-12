@@ -1,18 +1,20 @@
 package com.shop.service;
 
 import com.shop.dto.OrderDto;
-import com.shop.entity.Item;
-import com.shop.entity.Member;
-import com.shop.entity.Order;
-import com.shop.entity.OrderItem;
+import com.shop.dto.OrderHistDto;
+import com.shop.dto.OrderItemDto;
+import com.shop.entity.*;
+import com.shop.repository.ItemImgRepository;
 import com.shop.repository.ItemRepository;
 import com.shop.repository.MemberRepository;
 import com.shop.repository.OrderRepository;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,7 @@ public class OrderService {
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
+    private final ItemImgRepository itemImgRepository;
 
     public Long order(OrderDto orderDto, String email) {
         Item item = itemRepository.findById(orderDto.getItemId())
@@ -46,4 +49,36 @@ public class OrderService {
 
         return order.getId();
     }
+
+    @Transactional(readOnly = true)
+    public Page<OrderHistDto> getOrderList(String email, Pageable pageable) {
+        List<Order> orders = orderRepository.findOrders(email, pageable);
+        // 사용자 email과 페이징 조건을 활용해서 member가 주문한 order들을 찾아온다.
+        Long totalCount = orderRepository.countOrder(email);
+        // 사용자가 주문한 order의 총 개수를 찾아온다.
+
+        List<OrderHistDto> orderHistDtoList = new ArrayList<>();
+        // 주문 이력은 OrderHistDto 객체로 넘겨줄 것이기 때문에 새로운 OHD를 만든다.
+
+        for(Order order : orders) {
+            // member 가 주문한 모든 order를 OrderHistDto로 바꿔줘야 한다.
+            // 1. orderHistDto에는 orderItemDtoList와 itemImg(대표 이미지)가 필요하다.
+            // 2. order에는 여러개의 item이 존재할 수 있다. -> for문을 한번 더 돌린다.
+
+            OrderHistDto orderHistDto = new OrderHistDto(order);
+
+            List<OrderItem> orderItems = order.getOrderItems();
+            for(OrderItem orderItem : orderItems) {
+                ItemImg itemImg = itemImgRepository.findByItemIdAndRepimgYn(orderItem.getId(), "Y");
+
+                OrderItemDto orderItemDto = new OrderItemDto(orderItem, itemImg.getImgUrl());
+
+                orderHistDto.addOrderItem(orderItemDto);
+            }
+            orderHistDtoList.add(orderHistDto);
+        }
+        return new PageImpl<>(orderHistDtoList, pageable, totalCount);
+        // 페이지 구현 객체를 생성해서 반환한다.
+    }
+
 }

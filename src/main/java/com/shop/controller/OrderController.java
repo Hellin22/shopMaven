@@ -1,20 +1,24 @@
 package com.shop.controller;
 
 import com.shop.dto.OrderDto;
+import com.shop.dto.OrderHistDto;
 import com.shop.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -54,5 +58,20 @@ public class OrderController {
 
         return new ResponseEntity<Long>(orderId, HttpStatus.OK);
         // 결과값으로 생성된 주문 번호와 ok 상태코드를 리턴한다.
+    }
+
+    @GetMapping(value = {"/orders", "/orders/{page}"})
+    public String orderHist(@PathVariable("page")Optional<Integer> page, Principal principal, Model model) {
+        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 4);
+        // 한번에 가지고 올 주문 개수는 4개이다.
+
+        Page<OrderHistDto> ordersHistDtoList = orderService.getOrderList(principal.getName(), pageable);
+        // 현재 로그인한 회원은 이메일과 페이징 객체를 파라미터로 전달해서 OrderHistDto 데이터를 리턴값으로 받는다.
+
+        model.addAttribute("orders", ordersHistDtoList);
+        model.addAttribute("page", pageable.getPageNumber());
+        model.addAttribute("maxPage", 5);
+
+        return "order/orderHist";
     }
 }
