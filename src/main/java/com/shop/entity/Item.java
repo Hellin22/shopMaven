@@ -60,5 +60,9 @@ public class Item extends BaseEntity{
         }
         this.stockNumber = restStock;
     }
+
+    public void addStock(int stockNumber){
+        this.stockNumber += stockNumber;
+    } // 상품의 재고를 증가시키는 메서드
 }
 
